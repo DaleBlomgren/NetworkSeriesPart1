@@ -13,7 +13,6 @@
 #include <memory.h>
 #include <string.h>
 #include <dirent.h>
-/* You will have to modify the program below */
 
 #define MAXBUFSIZE 100
 #define FILEMAXSIZE 2000
@@ -29,9 +28,9 @@ int main (int argc, char * argv[] )
 	char cmd[MAXBUFSIZE];
 	char msg[MAXBUFSIZE] = "";
 	//char file_name[MAXBUFSIZE];
-	int nbytes;                        //number of bytes we receive in our message
+	int nbytes;                        
 	char buffer[MAXBUFSIZE]; 
-	int i = 0;            //a buffer to store our received message
+	int i = 0;            
 	if (argc != 2)
 	{
 		printf ("USAGE:  <port>\n");
@@ -76,7 +75,7 @@ int main (int argc, char * argv[] )
 	}
 
 	char * sCommand = strtok (buffer, " ");
-	//printf("%s", sCommand);
+	
 	int n_spaces = 0;
 	char ** user_input = NULL;
 
@@ -84,7 +83,7 @@ int main (int argc, char * argv[] )
     	user_input = realloc (user_input, sizeof (char*) * ++n_spaces);
 
     	if (user_input == NULL)
-    		exit (-1); /* memory allocation failed */
+    		exit (-1); 
 
     	user_input[n_spaces-1] = sCommand;
 

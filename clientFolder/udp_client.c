@@ -17,8 +17,6 @@
 
 char *end_flag = "$$&==&";
 
-/* You will have to modify the program below */
-
 int main (int argc, char * argv[])
 {
 
@@ -61,7 +59,6 @@ int main (int argc, char * argv[])
 	  it will report an error if the message fails to leave the computer
 	  however, with UDP, there is no error if the message is lost in the network once it leaves the computer.
 	 ******************/
-	//remote_len = sizeof(remote);
 	int i = 0;
 
 	while(i == 0){
@@ -89,8 +86,7 @@ int main (int argc, char * argv[])
     	}
     	strtok(user_input[0], "\n");
     	strtok(user_input[1], "\n");  
-		//printf("userinput1: %s\n", user_input[0]);
-		//printf("userinput2: %s\n", user_input[1]);
+		
 		
 		remote_len = sizeof(remote);
 		nbytes = sendto(sock, &cCmd, sizeof(cmd), 0, (struct sockaddr *)&remote, remote_len);
@@ -100,7 +96,7 @@ int main (int argc, char * argv[])
 
 		// Blocks till bytes are received
 		bzero(buffer,sizeof(buffer));
-		//printf("Waiting for response from server...\n");
+		printf("Waiting for response from server...\n");
 		if ((nbytes = recvfrom(sock, &buffer, sizeof(buffer), 0, (struct sockaddr *)&remote, &remote_len)) < 0){
 			printf("Error on recfrom()");
 		} 
@@ -161,9 +157,9 @@ int main (int argc, char * argv[])
     	else if(strcmp(buffer, "delete") == 0){
     		char buf[MAXBUFSIZE];
     		strncpy(msg, "ok", MAXBUFSIZE);
-    		//printf("Sending 'ok...\n");
+    		
     		nbytes = sendto(sock, &msg, sizeof(msg), 0, (struct sockaddr *)&remote, remote_len);
-    		//printf("Recieving from server...\n");
+    		
     		nbytes = recvfrom(sock, buf, MAXBUFSIZE, 0, (struct sockaddr *)&remote, &remote_len);
     		if (strcmp(buf, "Unable to delete file") == 0)
     			printf("File deletion error on file %s\n", user_input[1]);
@@ -172,9 +168,9 @@ int main (int argc, char * argv[])
     	else if(strcmp(buffer, "ls") == 0){
     		char buf[MAXBUFSIZE];
     		strncpy(msg, "ok", MAXBUFSIZE);
-    		//printf("Sending 'ok' to server...\n");
+    		
     		nbytes = sendto(sock, &msg, sizeof(msg), 0, (struct sockaddr *)&remote, remote_len);
-    		//printf("Recieving from server...\n");
+    		
     		while((nbytes = recvfrom(sock, buf, MAXBUFSIZE, 0, (struct sockaddr *)&remote, &remote_len))){
     			buf[nbytes] = 0;
     			if(!(strcmp(buf, "done"))){
