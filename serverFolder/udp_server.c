@@ -13,10 +13,6 @@
 #include <memory.h>
 #include <string.h>
 #include <dirent.h>
-<<<<<<< HEAD
-/* You will have to modify the program below */
-=======
->>>>>>> 0e1c370ff0a2564abe9befe8ad22d53abe06bcc3
 
 #define MAXBUFSIZE 100
 #define FILEMAXSIZE 2000
@@ -29,18 +25,11 @@ int main (int argc, char * argv[] )
 	int sock;                           //This will be our socket
 	struct sockaddr_in sin, remote;     //"Internet socket address structure"
 	unsigned int remote_length; 
-	char cmd[MAXBUFSIZE];
+	//char cmd[MAXBUFSIZE];
 	char msg[MAXBUFSIZE] = "";
-	//char file_name[MAXBUFSIZE];
-<<<<<<< HEAD
 	int nbytes;                        //number of bytes we receive in our message
 	char buffer[MAXBUFSIZE]; 
-	int i = 0;            //a buffer to store our received message
-=======
-	int nbytes;                        
-	char buffer[MAXBUFSIZE]; 
 	int i = 0;            
->>>>>>> 0e1c370ff0a2564abe9befe8ad22d53abe06bcc3
 	if (argc != 2)
 	{
 		printf ("USAGE:  <port>\n");
@@ -60,7 +49,8 @@ int main (int argc, char * argv[] )
 	sock = socket(AF_INET, SOCK_DGRAM, 0);
 	if (sock < 0)
 	{
-		printf("unable to create socket");
+		printf("Unable to create socket\n");
+		exit(0);
 	}
 
 
@@ -74,57 +64,50 @@ int main (int argc, char * argv[] )
 	}
 
 	remote_length = sizeof(remote);
-	while(i == 0){
-	//waits for an incoming message
-	bzero(buffer,sizeof(buffer));
-	nbytes = recvfrom(sock, &buffer, sizeof(buffer), 0, (struct sockaddr *)&remote, &remote_length);
-	
-	if (nbytes < 0)
-	{
-		printf("Error on recvfrom()");
-	}
+	while(i == 0){				//Causes looping behavior
+		bzero(buffer,sizeof(buffer));
+		printf("Reciving...\n");
+		nbytes = recvfrom(sock, &buffer, sizeof(buffer), 0, (struct sockaddr *)&remote, &remote_length); //waits for incoming message
+		if (nbytes < 0)
+		{
+			printf("Error on recvfrom()");
+		}
 
-	char * sCommand = strtok (buffer, " ");
-<<<<<<< HEAD
-	//printf("%s", sCommand);
-=======
-	
->>>>>>> 0e1c370ff0a2564abe9befe8ad22d53abe06bcc3
-	int n_spaces = 0;
-	char ** user_input = NULL;
+		char * sCommand = strtok (buffer, " ");
+		int n_spaces = 0;
+		char ** user_input = NULL;
 
-	while (sCommand) {
-    	user_input = realloc (user_input, sizeof (char*) * ++n_spaces);
+		while (sCommand) {
+    		user_input = realloc (user_input, sizeof (char*) * ++n_spaces);
+			if (user_input == NULL){
+    			exit (-1); 
+			}
+			user_input[n_spaces-1] = sCommand;
+			sCommand = strtok (NULL, " ");
+    	}
 
-    	if (user_input == NULL)
-<<<<<<< HEAD
-    		exit (-1); /* memory allocation failed */
-=======
-    		exit (-1); 
->>>>>>> 0e1c370ff0a2564abe9befe8ad22d53abe06bcc3
+    	if ((sizeof(user_input) / sizeof(user_input[0])) > 3){
+    		printf("Not recognize command %s.  Exiting...", buffer);
+    		exit(0);
+    	}
 
-    	user_input[n_spaces-1] = sCommand;
-
-    	sCommand = strtok (NULL, " ");
-    }
-    if ((sizeof(user_input) / sizeof(user_input[0])) > 3){
-    	printf("Not recognize command %s.  Exiting...", buffer);
-    	exit(0);
-    }
-    strtok(user_input[0], "\n");
-    strtok(user_input[1], "\n");
-    //while(i == 0){
+    	strtok(user_input[0], "\n");
+    	strtok(user_input[1], "\n");
+    	//printf("userinput1: %s\n", user_input[0]);
+    	//printf("userinput2: %s\n", user_input[1]);
+    
 		if (strcmp(user_input[0], "get") == 0){
 			int n, fd;
     		char buf[MAXBUFSIZE];
     		strncpy(msg, "get", MAXBUFSIZE);
     		sendto(sock, msg, strlen(msg), 0, (struct sockaddr *)&remote, remote_length);//++
-
+    		//printf("Sending 'get'...\n");
     		fd = open(user_input[1], O_RDONLY);
     		if (fd == -1){
     			printf("Error finding file %s. Exiting...\n", user_input[1]);
     			strncpy(msg, "filenotfound", MAXBUFSIZE);
     			sendto(sock, msg, strlen(msg), 0, (struct sockaddr *)&remote, remote_length);
+    			close(sock);
     			exit(0);
     		}
 
@@ -138,37 +121,58 @@ int main (int argc, char * argv[] )
 		else if (strcmp(user_input[0], "put") == 0){
 			int fd, n;
 		
-			char buf[MAXBUFSIZE];
+			char buf[MAXBUFSIZE] = "";
 			strncpy(msg, "put", MAXBUFSIZE);
 			nbytes = sendto(sock, &msg, sizeof(msg), 0, (struct sockaddr *)&remote, remote_length);
+			//printf("Sent 'put'...\n");
 			//nbytes = recvfrom(sock, &buf, sizeof(buf), 0, (struct sockaddr *)&remote, &remote_length);
-			fd = open(user_input[1], O_RDWR | O_CREAT, 0666);
-			if(fd == -1){
-				printf("unable to open %s, exiting...\n", user_input[1]);
+			recvfrom(sock, &buf, sizeof(buf), 0, (struct sockaddr *)&remote, &remote_length);
+			if (strcmp(buf, "ok") == 0){
+				fd = open(user_input[1], O_RDWR | O_CREAT, 0666);
+				if(fd == -1){
+					printf("unable to open %s, exiting...\n", user_input[1]);
+					exit(0);
+				}
+				sendto(sock, "ok", sizeof("ok"), 0, (struct sockaddr *)&remote, remote_length); 
+				//printf("Recieving file...\n");
+				while ((n = recvfrom(sock, buf, MAXBUFSIZE, 0,(struct sockaddr *)&remote, &remote_length))){
+					if (strcmp(buf, "error") == 0){
+						printf("Error in sending file, exiting...\n");
+						close(sock);
+						exit(0);
+					}
+					buf[n] = 0;
+					if(!(strcmp(buf, end_flag))){
+						break;
+					}
+					write(fd, buf, n);
+				}
+				close(fd);
+			}
+			else{
+				printf("File error on client side.  Exiting...\n");
+				close(sock);
 				exit(0);
 			}
-			while ((n = recvfrom(sock, buf, MAXBUFSIZE, 0,(struct sockaddr *)&remote, &remote_length))){
-				buf[n] = 0;
-				if(!(strcmp(buf, end_flag))){
-					break;
-				}
-				write(fd, buf, n);
-			}
-			close(fd);
 		}
 	
 		else if (strcmp(user_input[0], "delete") == 0){
+			int delCheck;
 			char buf[MAXBUFSIZE];
 			strncpy(msg, "delete", MAXBUFSIZE);
+			//printf("Sending 'delete'...\n");
 			nbytes = sendto(sock, &msg, sizeof(msg), 0, (struct sockaddr *)&remote, remote_length);
 			nbytes = recvfrom(sock, buf, MAXBUFSIZE, 0, (struct sockaddr *)&remote, &remote_length);
+			//printf("Waiting for 'ok'...\n");
 			if (strcmp(buf, "ok") == 0){
-				if (remove(user_input[1]) == 0){
-					strncpy(msg, "Deleted", MAXBUFSIZE);
+				delCheck = remove(user_input[1]);
+				if (delCheck == -1){
+					strncpy(msg, "Unable to delete file", MAXBUFSIZE);
 					sendto(sock, &msg, sizeof(msg), 0, (struct sockaddr *)&remote, remote_length);
+					printf("deletion failure\n");
 				}
 				else{
-					strncpy(msg, "Unable to delete file", MAXBUFSIZE);
+					strncpy(msg, "Deleted", MAXBUFSIZE);
 					sendto(sock, &msg, sizeof(msg), 0, (struct sockaddr *)&remote, remote_length);
 				}
 			}
@@ -184,8 +188,10 @@ int main (int argc, char * argv[] )
 			struct dirent *dp;
 		
 			strncpy(msg, "ls", MAXBUFSIZE);
+			//printf("Sending 'ls'...\n");
 			nbytes = sendto(sock, &msg, sizeof(msg), 0, (struct sockaddr *)&remote, remote_length);
 			nbytes = recvfrom(sock, buf, MAXBUFSIZE, 0, (struct sockaddr *)&remote, &remote_length);
+			//printf("Waiting for 'ok'...\n");
 			if (strcmp(buf, "ok") == 0){
 				if ((dir = opendir(".")) == NULL){
 					printf("Cannot open .");
@@ -209,21 +215,23 @@ int main (int argc, char * argv[] )
 		}
 	
 		else if (strcmp(user_input[0], "exit") == 0){
-			printf("Exiting...");
+			printf("Exiting...\n");
 			strncpy(msg, "exit", MAXBUFSIZE);
 			nbytes = sendto(sock, &msg, sizeof(msg), 0, (struct sockaddr *)&remote, remote_length);
+			//printf("Sent 'exit'...\n");
+			close(sock);
 			exit(0);
 		}
 		
 		else{
 			printf("Invalid input.  Exiting...\n");
 			sendto(sock, "error", sizeof("error"), 0, (struct sockaddr *)&remote, remote_length);
+			//printf("Sent 'error'...\n");
 			close(sock);
 			exit(0);
 		}
-		nbytes = sendto(sock, &msg, sizeof(msg), 0, (struct sockaddr *)&remote, remote_length);
-		if (nbytes < 0)
-		{
+		//nbytes = sendto(sock, &msg, sizeof(msg), 0, (struct sockaddr *)&remote, remote_length);
+		if (nbytes < 0){
 			printf("Error on sendto()");
 		}
 	}
