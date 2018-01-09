@@ -22,7 +22,7 @@ char *end_flag = "$$&==&";
 int main (int argc, char * argv[])
 {
 
-	int nbytes;                             // number of bytes send by sendto()
+	int nbytes, i = 0;                      // number of bytes send by sendto()
 	int sock;                               //this will be our socket
 	char buffer[MAXBUFSIZE];
 	
@@ -58,17 +58,31 @@ int main (int argc, char * argv[])
 	  it will report an error if the message fails to leave the computer
 	  however, with UDP, there is no error if the message is lost in the network once it leaves the computer.
 	 ******************/
-	printf("Please enter your command: ");
-	fgets(cmd, MAXBUFSIZE, stdin);
+	//printf("Please enter your command: ");
+	//fgets(cmd, MAXBUFSIZE, stdin);
 	char cCmd[MAXBUFSIZE];
 	char msg[MAXBUFSIZE] = "";
-	strcpy(cCmd, cmd);
-	char * sCommand = strtok (cmd, " "); //strtok will mutate cmd, make a copy first | Initialize with first part of cmd
+	//strcpy(cCmd, cmd);
+	char * sCommand;// = strtok (cmd, " "); //strtok will mutate cmd, make a copy first | Initialize with first part of cmd
 	//printf("%s", sCommand);
 	int nSpaces = 0;
-	char ** user_input = NULL;
+	//char ** user_input = NULL;
+	while (i == 0){
+		nSpaces = 0;
+		bzero(&msg, sizeof(msg));
+		//memset(cmd, 0, strlen(cmd));
+		bzero(&cmd, sizeof(cmd));
+		//memset(cCmd, 0, strlen(cCmd));
+		bzero(&cCmd, sizeof(cCmd));
+		//memset(msg, 0, strlen(msg));
+		printf("Please enter your command: ");
+		fgets(cmd, MAXBUFSIZE, stdin);
+		strcpy(cCmd, cmd);
+		nSpaces = 0;
+		char ** user_input = NULL;
+		sCommand = strtok(cmd, " ");
 
-
+	//while(strcmp(buffer, "exit") != 0){
 	while (sCommand) {
     	user_input = realloc (user_input, sizeof (char*) * ++nSpaces);
 		if (user_input == NULL){
@@ -84,20 +98,23 @@ int main (int argc, char * argv[])
     strtok(user_input[0], "\n");
     strtok(user_input[1], "\n");  
 	
+	//Sends request
 	remote_len = sizeof(remote);
 	nbytes = sendto(sock, &cCmd, sizeof(cmd), 0, (struct sockaddr *)&remote, remote_len);
 	if (nbytes < 0)
 	{
 		printf("Error on sendto()");
 	}
-
+	printf("Just sent... %s\n", cCmd);
 	// Blocks till bytes are received
+	//recieves confermation from server, returns command
 	bzero(buffer,sizeof(buffer));
 	if ((nbytes = recvfrom(sock, &buffer, sizeof(buffer), 0, (struct sockaddr *)&remote, &remote_len)) < 0)
 	{
 		printf("Error on recfrom()");
 	} 
-	//while(strcmp(buffer, "exit") != 0){ 
+	 
+	printf("buffer: %s\n", buffer);
 
 		if (strcmp(buffer, "put") == 0){
 			int n, fd;
@@ -152,7 +169,7 @@ int main (int argc, char * argv[])
 
     	}
     	else if(strcmp(buffer, "ls") == 0){
-    		char buf[MAXBUFSIZE];
+    		char buf[MAXBUFSIZE] = "";
     		strncpy(msg, "ok", MAXBUFSIZE);
     		nbytes = sendto(sock, &msg, sizeof(msg), 0, (struct sockaddr *)&remote, remote_len);
     		while((nbytes = recvfrom(sock, buf, MAXBUFSIZE, 0, (struct sockaddr *)&remote, &remote_len))){
@@ -162,6 +179,8 @@ int main (int argc, char * argv[])
     			}
     			printf("%s\n", buf);
     		}
+    		printf("%s\n", buf);
+    		bzero(&buf, sizeof(buf));
     	}
     	else if(strcmp(buffer, "exit") == 0){
     		printf("Server has shut down.  Exiting...\n");
@@ -173,7 +192,7 @@ int main (int argc, char * argv[])
     		exit(0);
     	}
     	
-	//}
+	}
 	printf("Transaction complete. Closing...\n");
 	close(sock);
 
