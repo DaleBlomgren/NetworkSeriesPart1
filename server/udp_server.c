@@ -13,10 +13,6 @@
 #include <memory.h>
 #include <string.h>
 #include <dirent.h>
-<<<<<<< HEAD
-/* You will have to modify the program below */
-=======
->>>>>>> 0e1c370ff0a2564abe9befe8ad22d53abe06bcc3
 
 #define MAXBUFSIZE 100
 #define FILEMAXSIZE 2000
@@ -30,15 +26,11 @@ int main (int argc, char * argv[])
 	//char cmd[MAXBUFSIZE];
 	char msg[MAXBUFSIZE] = "";
 	//char file_name[MAXBUFSIZE];
-<<<<<<< HEAD
+
 	int nbytes;                        //number of bytes we receive in our message
 	char buffer[MAXBUFSIZE]; 
 	int i = 0;            //a buffer to store our received message
-=======
-	int nbytes;                        
-	char buffer[MAXBUFSIZE]; 
-	int i = 0;            
->>>>>>> 0e1c370ff0a2564abe9befe8ad22d53abe06bcc3
+
 	if (argc != 2)
 	{
 		printf ("USAGE:  <port>\n");
@@ -82,7 +74,7 @@ int main (int argc, char * argv[])
 			printf("Error on recvfrom()");
 		}
 
-<<<<<<< HEAD
+
 		printf("blah: %s\n", buffer);
 		char * sCommand = strtok (buffer, " ");
 	
@@ -110,38 +102,7 @@ int main (int argc, char * argv[])
     	printf("user_input[0]: %s", user_input[0]);
     	printf("user_input[1]: %s", user_input[1]);
     	
-=======
-	char * sCommand = strtok (buffer, " ");
-<<<<<<< HEAD
-	//printf("%s", sCommand);
-=======
-	
->>>>>>> 0e1c370ff0a2564abe9befe8ad22d53abe06bcc3
-	int n_spaces = 0;
-	char ** user_input = NULL;
 
-	while (sCommand) {
-    	user_input = realloc (user_input, sizeof (char*) * ++n_spaces);
-
-    	if (user_input == NULL)
-<<<<<<< HEAD
-    		exit (-1); /* memory allocation failed */
-=======
-    		exit (-1); 
->>>>>>> 0e1c370ff0a2564abe9befe8ad22d53abe06bcc3
-
-    	user_input[n_spaces-1] = sCommand;
-
-    	sCommand = strtok (NULL, " ");
-    }
-    if ((sizeof(user_input) / sizeof(user_input[0])) > 3){
-    	printf("Not recognize command %s.  Exiting...", buffer);
-    	exit(0);
-    }
-    strtok(user_input[0], "\n");
-    strtok(user_input[1], "\n");
->>>>>>> 89d369eba778bc26e2595dc99f50e645d40c2050
-    //while(i == 0){
 
 		if (strcmp(user_input[0], "get") == 0){
 			int n, fd;
