@@ -10,12 +10,12 @@ guarentee a file will be recieved and is quite unreliable.__
 You can build the client and server with the 'make' command.  Launch server with _./server portnumber_ and you launch client with _./client serverip serverport'_.
 
 
-The commands at your disposal are...
+The commands at your disposal are...  
 
-... put 'filename'
-... get 'filename'
-... delete 'filename'
-... ls
-... exit
+···put 'filename'
+···get 'filename'
+···delete 'filename'
+···ls
+···exit
 
 #### Good times! 
