@@ -12,10 +12,10 @@ You can build the client and server with the 'make' command.  Launch server with
 
 The commands at your disposal are...  
 
-···put 'filename'
-···get 'filename'
-···delete 'filename'
-···ls
-···exit
+   put 'filename'  
+   get 'filename'  
+   delete 'filename'  
+   ls  
+   exit  
 
 #### Good times! 
