@@ -23,13 +23,10 @@ int main (int argc, char * argv[])
 	int sock;                           //This will be our socket
 	struct sockaddr_in sin, remote;     //"Internet socket address structure"
 	unsigned int remote_length; 
-	//char cmd[MAXBUFSIZE];
 	char msg[MAXBUFSIZE] = "";
-	//char file_name[MAXBUFSIZE];
-
 	int nbytes;                        //number of bytes we receive in our message
 	char buffer[MAXBUFSIZE]; 
-	int i = 0;            //a buffer to store our received message
+	int i = 0, n_spaces = 0;            
 
 	if (argc != 2)
 	{
@@ -37,10 +34,6 @@ int main (int argc, char * argv[])
 		exit(1);
 	}
 
-	/******************
-	  This code populates the sockaddr_in struct with
-	  the information about our socket
-	 ******************/
 	bzero(&sin,sizeof(sin));                    //zero the struct
 	sin.sin_family = AF_INET;                   //address family
 	sin.sin_port = htons(atoi(argv[1]));        //htons() sets the port # to network byte order
@@ -48,19 +41,12 @@ int main (int argc, char * argv[])
 
 	//Causes the system to create a generic socket of type UDP (datagram)
 	sock = socket(AF_INET, SOCK_DGRAM, 0);
-	if (sock < 0)
-	{
-		printf("unable to create socket");
+	if (sock < 0){
+		printf("Unable to create socket");
 	}
 
-
-	/******************
-	  Once we've created a socket, we must bind that socket to the 
-	  local address and port we've supplied in the sockaddr_in struct
-	 ******************/
-	if (bind(sock, (struct sockaddr *)&sin, sizeof(sin)) < 0)
-	{
-		printf("unable to bind socket\n");
+	if (bind(sock, (struct sockaddr *)&sin, sizeof(sin)) < 0){
+		printf("Unable to bind socket\n");
 	}
 
 	remote_length = sizeof(remote);
@@ -69,16 +55,14 @@ int main (int argc, char * argv[])
 		bzero(buffer,sizeof(buffer));
 		nbytes = recvfrom(sock, &buffer, sizeof(buffer), 0, (struct sockaddr *)&remote, &remote_length);
 	
-		if (nbytes < 0)
-		{
+		if (nbytes < 0){
 			printf("Error on recvfrom()");
 		}
 
 
 		printf("blah: %s\n", buffer);
 		char * sCommand = strtok (buffer, " ");
-	
-		int n_spaces = 0;
+		n_spaces = 0;
 		char ** user_input = NULL;
 
 		while (sCommand){
@@ -88,8 +72,7 @@ int main (int argc, char * argv[])
     			exit (-1); 
 
     		user_input[n_spaces-1] = sCommand;
-
-    		sCommand = strtok (NULL, " ");
+			sCommand = strtok (NULL, " ");
    		}
     	
     	if ((sizeof(user_input) / sizeof(user_input[0])) > 3){
@@ -102,8 +85,6 @@ int main (int argc, char * argv[])
     	printf("user_input[0]: %s", user_input[0]);
     	printf("user_input[1]: %s", user_input[1]);
     	
-
-
 		if (strcmp(user_input[0], "get") == 0){
 			int n, fd;
     		char buf[MAXBUFSIZE];
@@ -115,6 +96,7 @@ int main (int argc, char * argv[])
     			printf("Error finding file %s. Exiting...\n", user_input[1]);
     			strncpy(msg, "filenotfound", MAXBUFSIZE);
     			sendto(sock, msg, strlen(msg), 0, (struct sockaddr *)&remote, remote_length);
+    			close(sock);
     			exit(0);
     		}
 
@@ -131,7 +113,7 @@ int main (int argc, char * argv[])
 			char buf[MAXBUFSIZE];
 			strncpy(msg, "put", MAXBUFSIZE);
 			nbytes = sendto(sock, &msg, sizeof(msg), 0, (struct sockaddr *)&remote, remote_length);
-			//nbytes = recvfrom(sock, &buf, sizeof(buf), 0, (struct sockaddr *)&remote, &remote_length);
+			
 			fd = open(user_input[1], O_RDWR | O_CREAT, 0666);
 			if(fd == -1){
 				printf("unable to open %s, exiting...\n", user_input[1]);
@@ -169,9 +151,7 @@ int main (int argc, char * argv[])
 		}
 	
 		else if (strcmp(user_input[0], "ls") == 0){
-			printf("PINGPINGPING\n\n");
 			char buf[MAXBUFSIZE];
-			//char msg[MAXBUFSIZE] = "";
 			DIR *dir;
 			struct dirent *dp;
 		
@@ -181,6 +161,7 @@ int main (int argc, char * argv[])
 			if (strcmp(buf, "ok") == 0){
 				if ((dir = opendir(".")) == NULL){
 					printf("Cannot open .");
+					close(sock);
 					exit(0);
 				}
 			
@@ -191,21 +172,18 @@ int main (int argc, char * argv[])
 					}
 					else{
 					sendto(sock, &msg, sizeof(msg), 0, (struct sockaddr *)&remote, remote_length);
-					//printf("Sent: %s \n", msg);
 					}
 				}
 				strncpy(msg, "done", MAXBUFSIZE);
 				sendto(sock, &msg, sizeof(msg), 0, (struct sockaddr *)&remote, remote_length);
-				//bzero(&msg, sizeof(msg));
-
-			}
-			
+			}	
 		}
-	
+		
 		else if (strcmp(user_input[0], "exit") == 0){
 			printf("Exiting...");
 			strncpy(msg, "exit", MAXBUFSIZE);
 			nbytes = sendto(sock, &msg, sizeof(msg), 0, (struct sockaddr *)&remote, remote_length);
+			close(sock);
 			exit(0);
 		}
 		
@@ -215,11 +193,7 @@ int main (int argc, char * argv[])
 			close(sock);
 			exit(0);
 		}
-		//nbytes = sendto(sock, &msg, sizeof(msg), 0, (struct sockaddr *)&remote, remote_length);
-		if (nbytes < 0)
-		{
-			printf("Error on sendto()");
-		}
+		
 	}
 	printf("Transaction complete. Closing...\n");
 	close(sock);
