@@ -92,7 +92,7 @@ int main (int argc, char * argv[])
 
     		fd = open(user_input[1], O_RDONLY);
     		if (fd == -1){
-    			printf("Error finding file %s. Exiting...\n", user_inpush[1]);
+    			printf("Error finding file %s. Exiting...\n", user_input[1]);
     			strncpy(msg, "filenotfound", MAXBUFSIZE);
     			sendto(sock, msg, strlen(msg), 0, (struct sockaddr *)&remote, remote_length);
     			close(sock);
