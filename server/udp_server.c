@@ -81,8 +81,8 @@ int main (int argc, char * argv[])
 
     	strtok(user_input[0], "\n");
     	strtok(user_input[1], "\n");
-    	printf("user_input[0]: %s", user_input[0]);
-    	printf("user_input[1]: %s", user_input[1]);
+    	//printf("user_input[0]: %s", user_input[0]);
+    	//printf("user_input[1]: %s", user_input[1]);
     	
 		if (strcmp(user_input[0], "pull") == 0){
 			int n, fd;
