@@ -59,8 +59,7 @@ int main (int argc, char * argv[])
 			printf("Error on recvfrom()");
 		}
 
-
-		printf("blah: %s\n", buffer);
+		//printf("blah: %s\n", buffer);
 		char * sCommand = strtok (buffer, " ");
 		n_spaces = 0;
 		char ** user_input = NULL;
@@ -85,15 +84,15 @@ int main (int argc, char * argv[])
     	printf("user_input[0]: %s", user_input[0]);
     	printf("user_input[1]: %s", user_input[1]);
     	
-		if (strcmp(user_input[0], "get") == 0){
+		if (strcmp(user_input[0], "pull") == 0){
 			int n, fd;
     		char buf[MAXBUFSIZE];
-    		strncpy(msg, "get", MAXBUFSIZE);
+    		strncpy(msg, "pull", MAXBUFSIZE);
     		sendto(sock, msg, strlen(msg), 0, (struct sockaddr *)&remote, remote_length);//++
 
     		fd = open(user_input[1], O_RDONLY);
     		if (fd == -1){
-    			printf("Error finding file %s. Exiting...\n", user_input[1]);
+    			printf("Error finding file %s. Exiting...\n", user_inpush[1]);
     			strncpy(msg, "filenotfound", MAXBUFSIZE);
     			sendto(sock, msg, strlen(msg), 0, (struct sockaddr *)&remote, remote_length);
     			close(sock);
@@ -107,11 +106,11 @@ int main (int argc, char * argv[])
     		close(fd);
 		}
 	
-		else if (strcmp(user_input[0], "put") == 0){
+		else if (strcmp(user_input[0], "push") == 0){
 			int fd, n;
 		
 			char buf[MAXBUFSIZE];
-			strncpy(msg, "put", MAXBUFSIZE);
+			strncpy(msg, "push", MAXBUFSIZE);
 			nbytes = sendto(sock, &msg, sizeof(msg), 0, (struct sockaddr *)&remote, remote_length);
 			
 			fd = open(user_input[1], O_RDWR | O_CREAT, 0666);
@@ -192,8 +191,7 @@ int main (int argc, char * argv[])
 			sendto(sock, "error", sizeof("error"), 0, (struct sockaddr *)&remote, remote_length);
 			close(sock);
 			exit(0);
-		}
-		
+		}	
 	}
 	printf("Transaction complete. Closing...\n");
 	close(sock);

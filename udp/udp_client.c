@@ -94,7 +94,7 @@ int main (int argc, char * argv[])
 			printf("Error on recfrom()");
 		} 
 
-		if (strcmp(buffer, "put") == 0){
+		if (strcmp(buffer, "push") == 0){
 			int n, fd;
     		char buf[MAXBUFSIZE];
 
@@ -111,7 +111,7 @@ int main (int argc, char * argv[])
     		close(fd);
     	}
 
-    	else if(strcmp(buffer, "get") == 0){
+    	else if(strcmp(buffer, "pull") == 0){
     		int fd;
 			char buf[MAXBUFSIZE];
 		

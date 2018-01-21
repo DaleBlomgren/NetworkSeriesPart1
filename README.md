@@ -12,8 +12,8 @@ You can build the client and server with the 'make' command.  Launch server with
 
 The commands at your disposal are...  
 
-   put 'filename'  
-   get 'filename'  
+   push 'filename'  
+   pull 'filename'  
    delete 'filename'  
    ls  
    exit  
